@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UAS WEB Programming</title>
+    <style>
+        #tampil {
+            display: none;
+            padding: 10px;
+        }
+
+        #tampil span {
+            margin-bottom: 20px;
+            display: inline-block
+        }
+
+        #wrap {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #form {
+            background: bisque;
+            display: grid;
+
+        }
+        body {
+            width: 50%;
+            margin: auto;
+            font-family: Arial, Helvetica, sans-serif;
+            size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="form">
+    <p style="color: darkgrey; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; font-weight: bold;">**Pemesanan Tiket Maskapai**</p>
+    <div id="wrap">
+        <form action="" method="get" id="form">
+            <label>Nama Pemesan  :</label>
+            <input type="text" name="name" id="name"> <div id="err_name"></div> <br><br>
+    
+            <label>Jumlah Tiket :</label>
+            <input type="number" id="tiket"> <div id="err_tiket"></div> <br><br>
+
+            <label>Kelas :</label>
+            <select name="kelas" id="kelas">
+                <option value="ekonomi">Ekonomi</option>
+                <option value="bisnis">Bisnis</option>
+                <option value="eksekutif">Eksekutif</option>
+            </select> <br><br>
+            
+            <label>Tujuan :</label>
+            <select name="tujuan" id="tujuan">
+                <option value="Bali">Bali</option>
+                <option value="Yogyakarta">Yogyakarta</option>
+                <option value="Solo">Solo</option>
+            </select> <br><br>
+
+            <label>Bagasi :</label>
+            <input type="radio" checked name="ba" value="5kg"> 5kg
+            <input type="radio" name="ba" value="10kg"> 10kg
+            <input type="radio" name="ba" value="15kg"> 15kg  <br><br>
+    
+            <label>Asuransi :</label>
+            <input type="checkbox" checked name="asuransi" value="Asuransi Jiwa"> Asuransi Jiwa
+            <input type="checkbox" name="asuransi" value="Asuransi Kecelakaan"> Asuransi Kecelakaan
+            <input type="checkbox" name="asuransi" value="Asuransi Keterlambatan"> Asuransi Keterlambatan <br><br>
+    
+            <button type="submit" id="submit">Simpan</button>
+            <button type="reset" id="reset">Batal</button><br><br>
+        </form>
+    
+        <br><br>
+        
+        <div id="tampil">
+            <p style="color: darkgrey; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; font-weight: bold;">**Data Pemesanan Tiket Maskapai**</p> 
+        <table>
+            Nama    : <span id="txt_name"></span> <br>
+            Jumlah  : <span id="txt_tiket"></span> <br>
+            Kelas   : <span id="txt_kelas"></span> <br>
+            Tujuan  : <span id="txt_tujuan"></span> <br>
+            Bagasi  : <span id="txt_ba"></span> <br>
+            Asuransi: <span id="txt_asuransi"></span> <br>
+            Total Harga : <span id="txt_total"></span> <br>
+        </table>
+        </div>
+    </div>
+    </div>
+    <script>
+        document.getElementById("submit").addEventListener( "click", (e)=> {
+            e.preventDefault();
+
+            const formatRupiah = (money) => {
+                return new Intl.NumberFormat('id-ID',
+                    { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }
+                ).format(money);
+            }
+
+            document.getElementById('tampil').style.display = "block";
+
+            // Get Name
+            let name = document.getElementById('name').value;
+            document.getElementById('txt_name').innerHTML = name;
+
+            // Get Tiket
+            var tiket = document.getElementById("tiket").value;
+            var diskon = 0;
+            if(tiket > 3) diskon = 30 / 100
+            document.getElementById("txt_tiket").innerHTML = tiket;
+
+            // Get Kelas
+            var kelas = document.getElementById("kelas").value;
+            var harga = 0;
+            if(kelas == "ekonomi"){
+                kelas = "Ekonomi (Air Mineral)"
+                harga = 1000000
+            }else if(kelas == "bisnis") {
+                kelas = "Bisnis (Snack)"
+                harga = 2000000;
+            }else if(kelas == "eksekutif") {
+                kelas = "Eksekutif (Makanan)"
+                harga = 3000000;
+            }
+            document.getElementById("txt_kelas").innerHTML = kelas;
+            
+             // Get Tujuan
+             let tujuan = document.getElementById('tujuan');
+            document.getElementById('txt_tujuan').innerHTML = tujuan.value;
+
+            // get Ba
+            var ba = document.querySelector('input[name="ba"]:checked').value;
+            var biayaBagasi = 0;
+            if(ba == "5kg") biayaBagasi = 100000;
+            else if(ba == "10kg") biayaBagasi = 150000;
+            else if(ba == "15kg") biayaBagasi = 200000;
+            document.getElementById("txt_ba").innerHTML = `${ba} (${formatRupiah(biayaBagasi)})`;
+
+            // get Asuransi
+            var asuransi = document.querySelectorAll('input[name="asuransi"]:checked');
+            var txt_asuransi = "";
+            var i, biayaAsuransi;
+            for ( i = 0; i < asuransi.length; i++)
+                if (asuransi[i].checked) txt_asuransi += asuransi[i].value + ", <br>";
+            biayaAsuransi = i*50000
+            document.getElementById("txt_asuransi").innerHTML = `${txt_asuransi} (${formatRupiah(biayaAsuransi)})`;
+
+            // get Total
+            let total = harga * tiket - (diskon) + biayaBagasi + biayaAsuransi
+            document.getElementById("txt_total").innerHTML = formatRupiah(total);
+
+            // Validasi Simple
+            if(name.trim() == "" || tiket.trim() == "") {
+                if(name.trim() == "") {
+                    document.getElementById("err_name").innerHTML = "Di isi dahulu!"
+                    document.querySelector(".toggle-data").style.display = "none"
+                }else {
+                    document.getElementById("err_tiket").innerHTML = "Di isi dahulu!"
+                    document.querySelector(".toggle-data").style.display = "none"
+                }
+            }else {
+                if(name.trim() == "") {
+                    document.getElementById("err_name").innerHTML = ""
+                    document.querySelector(".toggle-data").style.display = "block"
+                }else {
+                    document.getElementById("err_tiket").innerHTML = ""
+                    document.querySelector(".toggle-data").style.display = "block"   
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>
